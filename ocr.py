@@ -8,10 +8,15 @@ class Screen:
         self.one, self.two, self.three, _ = input_.split(linesep)
 
     def __getitem__(self, key):
-        # TODO: slicing
-        k = key * 3
+        try:
+            k = key * 3
+            j = k + 3
+        except TypeError:  # we have slice
+            k = key.start * 3
+            j = key.stop * 3
+
         return linesep.join(
-            [self.one[k : k + 3], self.two[k : k + 3], self.three[k : k + 3]]
+            [self.one[k : j], self.two[k : j], self.three[k : j]]
         )
 
     def __iter__(self):
