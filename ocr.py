@@ -13,7 +13,6 @@ class Number:
 
     def __init__(self, input_):
         self.one, self.two, self.three, _ = input_.split(linesep)
-        self.__index = 0
 
     def __getitem__(self, key):
         if key > 8:
@@ -29,34 +28,22 @@ class Number:
         return DigitFactory((self.one[k:j], self.two[k:j], self.three[k:j]))
 
     def __str__(self):
-        s = ''.join(str(d) for d in self)
-        if "?" in s:
-            return f"{s} {UNRECOGNISED}"
-        return s
+        return "".join(str(d) for d in self)
 
     def __len__(self):
         return 9
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        try:
-            result = self[self.__index]
-        except IndexError:
-            raise StopIteration
-        self.__index += 1
-        return result
-
-    def is_valid(self):
+    def has_invalid_checksum(self):
         try:
             _, remainder = divmod(
-                sum(x * int(y) for x, y in zip(range(1, 10),
-                                               reversed(self))), 11
+                sum(x * int(y) for x, y in zip(range(1, 10), reversed(self))), 11
             )
         except UnrecognisedDigit:
             return False
-        return remainder == 0
+        return remainder != 0
+
+    def not_correctly(self):
+        return any([isinstance(d, Unknown) for d in self])
 
 
 class DigitFactory:
@@ -148,4 +135,15 @@ class Nine(Digit):
 
 def scan(text):
     scanned = Number(text)
+    return str(scanned)
+
+
+def validated_scan(text):
+    scanned = Number(text)
+    if scanned.not_correctly():
+        return f"{scanned} ILL"
+
+    if scanned.has_invalid_checksum():
+        return f"{scanned} ERR"
+
     return str(scanned)

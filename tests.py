@@ -1,4 +1,4 @@
-from ocr import scan
+from ocr import scan, validated_scan
 
 
 def test_input_0s():
@@ -118,7 +118,7 @@ def test_input_000000051():
         "|_||_||_||_||_||_||_| _|  |\n"
         "                           "
     )
-    assert scan(input_) == "000000051"
+    assert validated_scan(input_) == "000000051"
 
 
 def test_input_49006771_ill():
@@ -128,7 +128,7 @@ def test_input_49006771_ill():
         "  | _||_||_||_|  |  |  | _|\n"
         "                           "
     )
-    assert scan(input_) == "49006771? ILL"
+    assert validated_scan(input_) == "49006771? ILL"
 
 
 def test_input_12345678_ill():
@@ -138,7 +138,17 @@ def test_input_12345678_ill():
         "  ||_  _|  | _||_|  ||_| _ \n"
         "                           "
     )
-    assert scan(input_) == "1234?678? ILL"
+    assert validated_scan(input_) == "1234?678? ILL"
+
+
+def test_input_664371495_err():
+    input_ = (
+        " _  _     _  _        _  _ \n"
+        "|_ |_ |_| _|  |  ||_||_||_ \n"
+        "|_||_|  | _|  |  |  | _| _|\n"
+        "                           "
+    )
+    assert validated_scan(input_) == "664371495 ERR"
 
 
 import ocr
@@ -153,9 +163,9 @@ input_valid = (
 valid_number = ocr.Number(input_valid)
 
 input_invalid = (
-        "    _  _     _  _  _  _  _ \n"
-        "  | _| _||_| _ |_   ||_||_|\n"
-        "  ||_  _|  | _||_|  ||_| _ \n"
-        "                           "
-    )
+    "    _  _     _  _  _  _  _ \n"
+    "  | _| _||_| _ |_   ||_||_|\n"
+    "  ||_  _|  | _||_|  ||_| _ \n"
+    "                           "
+)
 invalid_number = ocr.Number(input_invalid)
