@@ -1,7 +1,14 @@
 from os import linesep
 
+INVALID_CHECKSUM = "ERR"
+UNRECOGNISED = "ILL"
 
-class Screen:
+
+class UnrecognisedDigit(Exception):
+    pass
+
+
+class Number:
     "Container translating input into individual characters"
 
     def __init__(self, input_):
@@ -21,6 +28,15 @@ class Screen:
 
         return DigitFactory((self.one[k:j], self.two[k:j], self.three[k:j]))
 
+    def __str__(self):
+        s = ''.join(str(d) for d in self)
+        if "?" in s:
+            return f"{s} {UNRECOGNISED}"
+        return s
+
+    def __len__(self):
+        return 9
+
     def __iter__(self):
         return self
 
@@ -31,6 +47,16 @@ class Screen:
             raise StopIteration
         self.__index += 1
         return result
+
+    def is_valid(self):
+        try:
+            _, remainder = divmod(
+                sum(x * int(y) for x, y in zip(range(1, 10),
+                                               reversed(self))), 11
+            )
+        except UnrecognisedDigit:
+            return False
+        return remainder == 0
 
 
 class DigitFactory:
@@ -63,60 +89,63 @@ class Digit:
     def __init__(self, text):
         self._text = text
 
-    def __unicode__(self):
-        return str(self.value)
+    def __str__(self):
+        return self.value
 
     def __int__(self):
-        return self.value
+        try:
+            return int(self.value)
+        except ValueError:
+            raise UnrecognisedDigit
 
     def __repr__(self):
         return linesep.join(self._text) + linesep
 
 
 class Unknown(Digit):
-    value = None  # FIXME: this will raise when int
+    value = "?"
 
 
 class Zero(Digit):
-    value = 0
+    value = "0"
 
 
 class One(Digit):
-    value = 1
+    value = "1"
 
 
 class Two(Digit):
-    value = 2
+    value = "2"
 
 
 class Three(Digit):
-    value = 3
+    value = "3"
 
 
 class Four(Digit):
-    value = 4
+    value = "4"
 
 
 class Five(Digit):
-    value = 5
+    value = "5"
 
 
 class Six(Digit):
-    value = 6
+    value = "6"
 
 
 class Seven(Digit):
-    value = 7
+    value = "7"
 
 
 class Eight(Digit):
-    value = 8
+    value = "8"
 
 
 class Nine(Digit):
-    value = 9
+    value = "9"
 
 
 def scan(text):
-    scanned = Screen(text)
-    return "".join(str(int(d)) for d in scanned)
+    scanned = Number(text)
+    return str(scanned)
