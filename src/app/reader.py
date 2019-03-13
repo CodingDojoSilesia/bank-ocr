@@ -14,8 +14,6 @@ class AccountNumberFileReader(object):
 class AccountNumberLineReader(object):
   def __init__(self, line):
     self.line = line
-    self.digits = 9
-
   
   def _get_nth_number(self, n):
     rows = self.line.split('\n')
