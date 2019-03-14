@@ -87,7 +87,7 @@ class DigitFactory:
         if text == ("   ", "  |", "  |") or text == "1":
             return One(("   ", "  |", "  |"))
         if text == (" _ ", " _|", "|_ ") or text == "2":
-            return Two(text)
+            return Two((" _ ", " _|", "|_ "))
         if text == (" _ ", " _|", " _|") or text == "3":
             return Three(text)
         if text == ("   ", "|_|", "  |") or text == "4":
@@ -142,6 +142,7 @@ class One(Digit):
 
 class Two(Digit):
     value = "2"
+    _options = []
 
 
 class Three(Digit):
@@ -151,6 +152,7 @@ class Three(Digit):
 
 class Four(Digit):
     value = "4"
+    _options = []
 
 
 class Five(Digit):
