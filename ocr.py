@@ -11,20 +11,19 @@ class UnrecognisedDigit(Exception):
 class Number:
     "Container translating input into individual characters"
 
-    # change this into from_text
     @classmethod
     def from_text(cls, text):
-
-        # FIXME: rename to from_text
-        # method should parse incoming text as __init__ does now
-        # and use digit factory to create a list of digits
-        # __init__ should accept list of digits
-        # iteration and slicing will be much simpler as will be performed
-        # on an actual internal list
         one, two, three, _ = text.split(linesep)
-        digits = [DigitFactory((one[x*3: (x+1)*3],
-                                two[x*3: (x+1)*3],
-                                three[x*3: (x+1)*3])) for x in range(0, 9)]
+        digits = [
+            DigitFactory(
+                (
+                    one[x * 3 : (x + 1) * 3],
+                    two[x * 3 : (x + 1) * 3],
+                    three[x * 3 : (x + 1) * 3],
+                )
+            )
+            for x in range(0, 9)
+        ]
         return Number(digits)
 
     def __init__(self, digits):
@@ -58,7 +57,7 @@ class Number:
                 try:
                     c = list(self)
                     c[i] = f
-                    new = Number.from_list(c)
+                    new = Number(c)
                 except IndexError:
                     new = []
                 p.append(new)
@@ -202,9 +201,9 @@ def guessed_scan(text):
 
     if scanned.has_invalid_checksum():
         # get all possible numbers
-        return [n for n in scanned.possible_numbers() if not n.has_invalid_checksum()]
-        # iterate and see if any has valid checksum
-        # return successes
-        # return f"{scanned} ERR"
+        found = [
+            str(n) for n in scanned.possible_numbers() if not n.has_invalid_checksum()
+        ]
+        return ",".join(found)
 
     return str(scanned)
