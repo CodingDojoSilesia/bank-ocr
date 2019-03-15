@@ -52,19 +52,19 @@ class Number:
 
     def possible_numbers(self):
         p = []
+        # TODO: this might not need enumerate
         for i, d in enumerate(self):
             for f in d.flips():
                 c = list(self)
                 c[i] = f
                 new = Number(c)
                 p.append(new)
+
         return p
 
+    def fix(self):
+        return Number([d.fix() for d in self])
 
-# This might be for fixing incorrectly scanned numbers
-# allowed_combinations = ["   ", " _ ", "  |", "| |", " _|", "|_ ", "|_|"]
-# [0 elements, 1 element, 2 elements, 3 elements]
-# count elements in current frame see if moving left or right will fix it
 
 
 class DigitFactory:
@@ -106,11 +106,23 @@ class Digit:
         except ValueError:
             raise UnrecognisedDigit
 
-    # def __repr__(self):
-    #     return linesep.join(self._text) + linesep
-
     def flips(self):
         return [DigitFactory(o) for o in self._options]
+
+    def fix(self):
+        if self.value != "?":
+            return self
+        # This might be for fixing incorrectly scanned numbers
+        # allowed_combinations = ["   ", " _ ", "  |", "| |", " _|", "|_ ", "|_|"]
+        # [0 elements, 1 element, 2 elements, 3 elements]
+        # count elements in current frame see if moving left or right will fix it
+
+        # iterate over text representation
+        # see if there is only one broken
+        # check every option of one pipe less or one pipe more
+        # see if after check we have a number
+        #
+        pass
 
 
 class Unknown(Digit):
@@ -186,7 +198,8 @@ def validated_scan(text):
 def guessed_scan(text):
     scanned = Number.from_text(text)
     if scanned.not_correctly():
-        return f"{scanned} ILL"
+        fixed = scanned.fix()
+        return f"{fixed}"
 
     if scanned.has_invalid_checksum():
         # get all possible numbers
