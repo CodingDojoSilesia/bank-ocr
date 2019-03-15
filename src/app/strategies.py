@@ -254,6 +254,9 @@ class ExactMatching(object):
 
         >> ExactMatching().match(d)
         => '0'
+
+        >> ExactMatching().match('')
+        => None
     '''
     target_schema = tuple(digit.split('\n'))
     for digit, schema in self.KNOWN_DIGITS:
@@ -271,14 +274,14 @@ class FuzzyMatching(ExactMatching):
       :param digit: (str) - multiline string 
                             representing a simple digit
 
-        :return list: list of string digits
-                      that are CLOSE to given input
-                      or None if not found
+      :return list: list of string digits
+                    that are CLOSE to given input
+                    or None if not found
 
-        Search for digits that ONLY look-alike given digit
-        but are NOT the same.
+      Search for digits that ONLY look-alike given digit
+      but are NOT the same.
 
-        Example:
+      Example:
           
           d = ' _ \n' \
               '| |\n \
