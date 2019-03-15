@@ -54,18 +54,10 @@ class Number:
         p = []
         for i, d in enumerate(self):
             for f in d.flips():
-                try:
-                    c = list(self)
-                    c[i] = f
-                    new = Number(c)
-                except IndexError:
-                    new = []
+                c = list(self)
+                c[i] = f
+                new = Number(c)
                 p.append(new)
-        # create list of possible no (PN)
-        # FIXME: iterate over digits
-        # get all other options for each digit
-        # append to list of PN
-        # return list of PN
         return p
 
 
@@ -73,11 +65,6 @@ class Number:
 # allowed_combinations = ["   ", " _ ", "  |", "| |", " _|", "|_ ", "|_|"]
 # [0 elements, 1 element, 2 elements, 3 elements]
 # count elements in current frame see if moving left or right will fix it
-
-# this might be for finding valid checksums
-# another approach is to figure out possible transitions
-# 9 can only be 8 or vice versa
-# 6 can only be 8 and vice versa
 
 
 class DigitFactory:
@@ -203,9 +190,9 @@ def guessed_scan(text):
 
     if scanned.has_invalid_checksum():
         # get all possible numbers
-        found = sorted([
-            str(n) for n in scanned.possible_numbers() if not n.has_invalid_checksum()
-        ])
+        found = sorted(
+            [str(n) for n in scanned.possible_numbers() if not n.has_invalid_checksum()]
+        )
         if len(found) > 1:
             return f"{scanned} AMB {found}"
 
