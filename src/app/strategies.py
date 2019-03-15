@@ -284,14 +284,14 @@ class FuzzyMatching(ExactMatching):
               '| |\n \
               '|_|'
 
-          >> ExactMatching().match(d)
+          >> FuzzyMatching().match(d)
           => ['8']
 
           d2 = ' _ \n' \
                '|  \n \
                '|_|'
 
-          >> ExactMatching().match(d)
+          >> FuzzyMatching().match(d)
           => ['0', '6']
     '''
     target_schema = tuple(digit.split('\n'))
