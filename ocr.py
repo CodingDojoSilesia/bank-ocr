@@ -157,7 +157,7 @@ class Four(Digit):
 
 class Five(Digit):
     value = "5"
-    _options = ["9"]
+    _options = ["9", "6"]
 
 
 class Six(Digit):
@@ -172,12 +172,12 @@ class Seven(Digit):
 
 class Eight(Digit):
     value = "8"
-    _options = ["0"]
+    _options = ["0", "6", "9"]
 
 
 class Nine(Digit):
     value = "9"
-    _options = ["8", "3"]
+    _options = ["8", "3", "5"]
 
 
 def scan(text):
@@ -203,9 +203,12 @@ def guessed_scan(text):
 
     if scanned.has_invalid_checksum():
         # get all possible numbers
-        found = [
+        found = sorted([
             str(n) for n in scanned.possible_numbers() if not n.has_invalid_checksum()
-        ]
+        ])
+        if len(found) > 1:
+            return f"{scanned} AMB {found}"
+
         return ",".join(found)
 
     return str(scanned)
