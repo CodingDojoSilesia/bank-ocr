@@ -222,7 +222,7 @@ MATCHING_DIGITS = (
      '  |'),
     (' _ ',
      '|_|',
-     ' _'),
+     ' _ '),
   ))
 )
 
@@ -238,6 +238,23 @@ class ExactMatching(object):
   NOT_FOUND = None
 
   def match(self, digit):
+    '''
+      :param digit: (str) - multiline string 
+                            representing a simple digit
+
+      :return str: string digit or None if not found
+
+      Check if given string is an actual number
+
+      Example:
+        
+        d = ' _ \n' \
+            '| |\n \
+            '|_|'
+
+        >> ExactMatching().match(d)
+        => '0'
+    '''
     target_schema = tuple(digit.split('\n'))
     for digit, schema in self.KNOWN_DIGITS:
       if schema == target_schema:
@@ -250,19 +267,37 @@ class FuzzyMatching(ExactMatching):
   NOT_FOUND = None
 
   def match(self, digit):
-    exact_match = super().match(digit)
-    if exact_match is None:
-      return self._close_match(digit)
-    return exact_match
-    
+    '''
+      :param digit: (str) - multiline string 
+                            representing a simple digit
 
-  def _close_match(self, digit):
+        :return list: list of string digits
+                      that are CLOSE to given input
+                      or None if not found
+
+        Search for digits that ONLY look-alike given digit
+        but are NOT the same.
+
+        Example:
+          
+          d = ' _ \n' \
+              '| |\n \
+              '|_|'
+
+          >> ExactMatching().match(d)
+          => ['8']
+
+          d2 = ' _ \n' \
+               '|  \n \
+               '|_|'
+
+          >> ExactMatching().match(d)
+          => ['0', '6']
+    '''
     target_schema = tuple(digit.split('\n'))
     matching_digits = []
     for digit, schemas in self.MATCHING_DIGITS:
       if any(target_schema == schema for schema in schemas):
         matching_digits.append(digit)
     
-    if not matching_digits:
-      return self.NOT_FOUND
-    return matching_digits
+    return matching_digits or self.NOT_FOUND
