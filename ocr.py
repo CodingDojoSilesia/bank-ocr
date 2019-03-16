@@ -132,13 +132,14 @@ class Digit:
             else:
                 pipe_range = range(0, pipes + 2)
             replacements = chain.from_iterable([n[p] for p in pipe_range])
+
             def new_digit(current_digit, element_index, replacement):
                 c = list(current_digit[:])
                 c[element_index] = replacement
                 return tuple(c)
+
             proposed_digits = [
-                DigitFactory(new_digit(self._text, i, x))
-                for x in replacements
+                DigitFactory(new_digit(self._text, i, x)) for x in replacements
             ]
             proper_digits = [d for d in proposed_digits if not isinstance(d, Unknown)]
             f.extend(proper_digits)
