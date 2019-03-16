@@ -1,3 +1,4 @@
+from itertools import chain
 from os import linesep
 
 INVALID_CHECKSUM = "ERR"
@@ -38,6 +39,9 @@ class Number:
     def __len__(self):
         return len(self._number)
 
+    def index(self, el):
+        return self._number.index(el)
+
     def has_invalid_checksum(self):
         try:
             _, remainder = divmod(
@@ -63,8 +67,14 @@ class Number:
         return p
 
     def fix(self):
-        return Number([d.fix() for d in self])
-
+        p = []
+        for d in self:
+            for f in d.fixes():
+                c = self[:]
+                c[self.index(d)] = f
+                new = Number(c)
+                p.append(new)
+        return p
 
 
 class DigitFactory:
@@ -89,7 +99,6 @@ class DigitFactory:
             return Eight((" _ ", "|_|", "|_|"))
         if text == (" _ ", "|_|", " _|") or text == "9":
             return Nine(text)
-
         return Unknown(text)
 
 
@@ -109,20 +118,31 @@ class Digit:
     def flips(self):
         return [DigitFactory(o) for o in self._options]
 
-    def fix(self):
+    def fixes(self):
         if self.value != "?":
-            return self
-        # This might be for fixing incorrectly scanned numbers
-        # allowed_combinations = ["   ", " _ ", "  |", "| |", " _|", "|_ ", "|_|"]
-        # [0 elements, 1 element, 2 elements, 3 elements]
-        # count elements in current frame see if moving left or right will fix it
+            return []
 
-        # iterate over text representation
-        # see if there is only one broken
-        # check every option of one pipe less or one pipe more
-        # see if after check we have a number
-        #
-        pass
+        n = {0: ["   "], 1: [" _ ", "  |"], 2: ["| |", " _|", "|_ "], 3: ["|_|"]}
+        f = []
+
+        for i, e in enumerate(self._text):
+            pipes = e.count("_") + e.count("|")
+            if pipes >= 2:
+                pipe_range = range(0, 3)
+            else:
+                pipe_range = range(0, pipes + 2)
+            replacements = chain.from_iterable([n[p] for p in pipe_range])
+            def new_digit(current_digit, element_index, replacement):
+                c = list(current_digit[:])
+                c[element_index] = replacement
+                return tuple(c)
+            proposed_digits = [
+                DigitFactory(new_digit(self._text, i, x))
+                for x in replacements
+            ]
+            proper_digits = [d for d in proposed_digits if not isinstance(d, Unknown)]
+            f.extend(proper_digits)
+        return f
 
 
 class Unknown(Digit):
@@ -198,7 +218,7 @@ def validated_scan(text):
 def guessed_scan(text):
     scanned = Number.from_text(text)
     if scanned.not_correctly():
-        fixed = scanned.fix()
+        fixed = [str(n) for n in scanned.fix() if not n.has_invalid_checksum()][0]
         return f"{fixed}"
 
     if scanned.has_invalid_checksum():
