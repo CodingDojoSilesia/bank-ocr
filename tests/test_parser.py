@@ -1,4 +1,4 @@
-from app.parser import FuzzyDigitParser, ExactDigitParser
+from app.parser import match
 
 import pytest
 
@@ -45,56 +45,63 @@ import pytest
     ' _|' ,
   ), '9')
 ])
-def test__exact_matching_known_digits_recognition(_input, expected_output):
-  parser = ExactDigitParser()
-  assert parser.parse('\n'.join(_input)) == expected_output
+def test__match_recognized_digits(_input, expected_output):
+  schema = match('\n'.join(_input))
+  assert schema.value() == expected_output
 
 
 @pytest.mark.parametrize('_input', [
   (' _ ',
    '|  ',
-   '|_|',
+   ' _ ',
   ),
-  ('   ',
-   ' _|',
+  (' _ ',
+   ' _ ',
    '  |',
   ),
   ('   ',
    '| |',
-   '  |',
+   '| |',
   ),
   ('   ',
    ' _|',
    '| |',
   ),
 ])
-def test__exact_matching_unknown_digits_recognition(_input):
-  parser = ExactDigitParser()
-  assert parser.parse('\n'.join(_input)) == ExactDigitParser.NOT_FOUND
+def test__match_unrecognized_digit(_input):
+  schema = match('\n'.join(_input))
+  assert schema.value() == '?'
 
-
-@pytest.mark.parametrize('_input, expected_output', [
+@pytest.mark.parametrize('_input, first_match, optional', [
   ((
     ' _ ',
     '|  ',
     '|_|'
-  ), ['0', '6']),
+  ), '0', ['6']),
   ((
     ' _ ',
     ' _ ',
     ' _|'
-  ), ['3', '5']),
+  ), '3', ['5']),
   ((
     '   ',
     '   ',
     '  |'
-  ), ['1']),
+  ), '1', []),
   ((
     '   ',
     '|_|',
     '   '
-  ), ['4'])
+  ), '4', []),
+  ((
+    ' _ ',
+    '|_ ',
+    ' _|'
+  ), '5', ['6', '9'])
 ])
-def test__fuzzy_matching_unknown_digits_recognition(_input, expected_output):
-  parser = FuzzyDigitParser()
-  assert parser.parse('\n'.join(_input)) == expected_output
+def test__match_lookalike_digits(_input, first_match, optional):
+  schema = match('\n'.join(_input))
+  assert schema.value() == first_match
+
+  for digit, expected in zip(schema.close_digits(), optional):
+    assert digit.value == expected
