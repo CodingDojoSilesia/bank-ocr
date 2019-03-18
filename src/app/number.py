@@ -31,7 +31,7 @@ class DigitSchema(Digit):
 
   def matches(self, target: List[str], diff_limit: int = 0) -> int:
     return sum((self.schema[r][c] != target[r][c] for r in range(3) 
-                                                  for c in range(3))) == diff_limit
+                                                  for c in range(3))) <= diff_limit
 
   def __str__(self):
     return self.value()
