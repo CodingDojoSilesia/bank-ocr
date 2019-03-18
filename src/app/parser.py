@@ -4,9 +4,6 @@ from app.number import Digit, UnknownDigit, DigitSchema
 from app.settings import KNOWN_SCHEMAS, unknown
 
 
-NOT_FOUND = '?'
-
-
 def _match_exact(text: str) -> DigitSchema:
   target_schema = text.split('\n')
   for schema in KNOWN_SCHEMAS:

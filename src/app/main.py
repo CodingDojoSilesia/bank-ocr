@@ -56,6 +56,7 @@ def story_04():
     if not account.is_malformed() and not account.is_error():
       print('=>', account)
     else:
+      # Try to generate number that has valid checksum and is not malformed
       account_generator = AccountNumberGenerator(schemas)
       accounts = [acc for acc in account_generator if not acc.is_malformed()]
       valid_accounts = [acc for acc in accounts if not acc.is_error()]
