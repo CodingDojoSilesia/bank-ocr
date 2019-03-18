@@ -1,7 +1,7 @@
 from typing import List
 
 from app.number import Digit, UnknownDigit, DigitSchema
-from app.settings import KNOWN_SCHEMAS, unknown
+from app.settings import KNOWN_SCHEMAS
 
 
 def _match(text: str, diff_limit: int = 1) -> DigitSchema:

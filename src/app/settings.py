@@ -1,10 +1,5 @@
 from app.number import Digit, DigitSchema
 
-
-unknown = Digit(
-  value='?'
-)
-
 zero = Digit(
   value='0',
 )
