@@ -8,11 +8,11 @@ class UnrecognisedDigit(Exception):
 class DigitFactory:
     def __new__(cls, text):
         if text == (" _ ", "| |", "|_|") or text == "0":
-            return Zero((" _ ", "| |", "|_|"))
+            return Zero(text)
         if text == ("   ", "  |", "  |") or text == "1":
-            return One(("   ", "  |", "  |"))
+            return One(text)
         if text == (" _ ", " _|", "|_ ") or text == "2":
-            return Two((" _ ", " _|", "|_ "))
+            return Two(text)
         if text == (" _ ", " _|", " _|") or text == "3":
             return Three(text)
         if text == ("   ", "|_|", "  |") or text == "4":
@@ -22,9 +22,9 @@ class DigitFactory:
         if text == (" _ ", "|_ ", "|_|") or text == "6":
             return Six(text)
         if text == (" _ ", "  |", "  |") or text == "7":
-            return Seven((" _ ", "  |", "  |"))
+            return Seven(text)
         if text == (" _ ", "|_|", "|_|") or text == "8":
-            return Eight((" _ ", "|_|", "|_|"))
+            return Eight(text)
         if text == (" _ ", "|_|", " _|") or text == "9":
             return Nine(text)
         return Unknown(text)
@@ -51,8 +51,8 @@ class Digit:
         return [DigitFactory(o) for o in self._options]
 
     def fixes(self):
-        if self.value != "?":
-            return []
+        if self.known:
+            return []  # no fixes for known digit
 
         n = {0: ["   "], 1: [" _ ", "  |"], 2: ["| |", " _|", "|_ "], 3: ["|_|"]}
         f = []
@@ -73,7 +73,7 @@ class Digit:
             proposed_digits = [
                 DigitFactory(new_digit(self._text, i, x)) for x in replacements
             ]
-            proper_digits = [d for d in proposed_digits if not isinstance(d, Unknown)]
+            proper_digits = [d for d in proposed_digits if d.known]
             f.extend(proper_digits)
         return f
 

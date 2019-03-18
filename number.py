@@ -1,6 +1,6 @@
 from os import linesep
 
-from digit import DigitFactory as Digit
+from digit import DigitFactory
 from digit import UnrecognisedDigit
 
 
@@ -9,9 +9,14 @@ class Number:
 
     @classmethod
     def from_text(cls, text):
+        """Alternative constructor to Number class.
+
+        Supports scanning of text and generating Digits.
+        Similar as https://docs.python.org/3.7/library/stdtypes.html#dict.fromkeys
+        """
         one, two, three, _ = text.split(linesep)
         digits = [
-            Digit(
+            DigitFactory(
                 (
                     one[x * 3 : (x + 1) * 3],
                     two[x * 3 : (x + 1) * 3],
@@ -22,14 +27,14 @@ class Number:
         ]
         return Number(digits)
 
+    def __str__(self):
+        return "".join(str(d) for d in self._number)
+
     def __init__(self, digits):
         self._number = digits
 
     def __getitem__(self, key):
         return self._number[key]
-
-    def __str__(self):
-        return "".join(str(d) for d in self._number)
 
     def __len__(self):
         return len(self._number)
@@ -37,27 +42,31 @@ class Number:
     def index(self, el):
         return self._number.index(el)
 
-    def has_invalid_checksum(self):
+    def checksum_valid(self):
+        """ Verifies if Number has a valid checksum."""
         try:
             _, remainder = divmod(
                 sum(x * int(y) for x, y in zip(range(1, 10), reversed(self))), 11
             )
-        except UnrecognisedDigit:
+        except UnrecognisedDigit:  # bail on Unknown digit
             return False
-        return remainder != 0
+        return remainder == 0
 
-    def not_correctly(self):
+    def checksum_invalid(self):
+        return not self.checksum_valid()
+
+    def incorrect_scan(self):
         return any([not d.known for d in self])
 
     def possible_numbers(self):
         p = []
-        # TODO: this might not need enumerate
-        for i, d in enumerate(self):
+        for d in self:
             for f in d.flips():
-                c = list(self)
-                c[i] = f
+                c = self[:]
+                c[self.index(d)] = f
                 new = Number(c)
-                p.append(new)
+                if new.checksum_valid():
+                    p.append(new)
 
         return p
 
@@ -68,5 +77,6 @@ class Number:
                 c = self[:]
                 c[self.index(d)] = f
                 new = Number(c)
-                p.append(new)
+                if new.checksum_valid():
+                    p.append(new)
         return p

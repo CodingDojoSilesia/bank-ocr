@@ -1,39 +1,34 @@
 from number import Number
 
-INVALID_CHECKSUM = "ERR"
-UNRECOGNISED = "ILL"
-
 
 def scan(text):
-    scanned = Number.from_text(text)
-    return str(scanned)
+    number = Number.from_text(text)
+    return str(number)
 
 
 def validated_scan(text):
-    scanned = Number.from_text(text)
-    if scanned.not_correctly():
-        return f"{scanned} ILL"
+    number = Number.from_text(text)
+    if number.incorrect_scan():
+        return f"{number} ILL"
 
-    if scanned.has_invalid_checksum():
-        return f"{scanned} ERR"
+    if number.checksum_invalid():
+        return f"{number} ERR"
 
-    return str(scanned)
+    return str(number)
 
 
 def guessed_scan(text):
-    scanned = Number.from_text(text)
-    if scanned.not_correctly():
-        fixed = [str(n) for n in scanned.fix() if not n.has_invalid_checksum()][0]
+    number = Number.from_text(text)
+    if number.incorrect_scan():
+        fixed = [n for n in number.fix()][0]
         return f"{fixed}"
 
-    if scanned.has_invalid_checksum():
+    if number.checksum_invalid():
         # get all possible numbers
-        found = sorted(
-            [str(n) for n in scanned.possible_numbers() if not n.has_invalid_checksum()]
-        )
+        found = sorted([str(n) for n in number.possible_numbers()])
         if len(found) > 1:
-            return f"{scanned} AMB {found}"
+            return f"{number} AMB {found}"
 
         return ",".join(found)
 
-    return str(scanned)
+    return str(number)
