@@ -4,34 +4,25 @@ from app.number import Digit, UnknownDigit, DigitSchema
 from app.settings import KNOWN_SCHEMAS, unknown
 
 
-def _match_exact(text: str) -> DigitSchema:
+def _match(text: str, diff_limit: int = 1) -> DigitSchema:
   target_schema = text.split('\n')
+  possible_matches = []
   for schema in KNOWN_SCHEMAS:
-    diff_count = schema.count_differences(target_schema)
-    if diff_count == 0:
+    if schema.matches(target_schema):
       return schema
-  return None
-
-def _match_close(text: str, diff_limit: int = 1) -> DigitSchema:
-  target_schema = text.split('\n')
-  possible_digits = []
-  for schema in KNOWN_SCHEMAS:
-    diff_count = schema.count_differences(target_schema)
-    if 0 < diff_count <= diff_limit:
-      possible_digits.append(schema.digit)  
-  if possible_digits:
+    elif schema.matches(target_schema, diff_limit=diff_limit):
+      possible_matches.append(schema.digit)
+  
+  if possible_matches:
     return DigitSchema(
       schema=target_schema,
-      digit=possible_digits[0],
-      optional=possible_digits[1:]
+      digit=possible_matches[0],
+      optional=possible_matches[1:]
     )
   return None
 
 def match(text: str) -> DigitSchema:
-  match = _match_exact(text)
-  if not match:
-    match = _match_close(text)
-  return match or DigitSchema(
+  return _match(text) or DigitSchema(
     schema=text,
     digit=UnknownDigit(),
     optional=[]
