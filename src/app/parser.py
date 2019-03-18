@@ -23,7 +23,7 @@ def _match(text: str, diff_limit: int = 1) -> DigitSchema:
 
 def match(text: str) -> DigitSchema:
   return _match(text) or DigitSchema(
-    schema=text,
+    schema=text.split('\n'),
     digit=UnknownDigit(),
     optional=[]
   )
