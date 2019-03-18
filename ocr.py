@@ -20,8 +20,8 @@ def validated_scan(text):
 def guessed_scan(text):
     number = Number.from_text(text)
     if number.incorrect_scan():
-        fixed = [n for n in number.fix()][0]
-        return f"{fixed}"
+        fixed = [str(n) for n in number.fix()]
+        return ",".join(fixed)
 
     if number.checksum_invalid():
         # get all possible numbers

@@ -48,14 +48,14 @@ class Digit:
         return not issubclass(self.__class__, Unknown)
 
     def flips(self):
-        return [DigitFactory(o) for o in self._options]
+        return (DigitFactory(o) for o in self._options)
 
     def fixes(self):
         if self.known:
-            return []  # no fixes for known digit
+            yield self  # no fixes for known digit
 
+        # {number of "_" or "|" : list of combinations}
         n = {0: ["   "], 1: [" _ ", "  |"], 2: ["| |", " _|", "|_ "], 3: ["|_|"]}
-        f = []
 
         for i, e in enumerate(self._text):
             pipes = e.count("_") + e.count("|")
@@ -73,9 +73,9 @@ class Digit:
             proposed_digits = [
                 DigitFactory(new_digit(self._text, i, x)) for x in replacements
             ]
-            proper_digits = [d for d in proposed_digits if d.known]
-            f.extend(proper_digits)
-        return f
+            for d in proposed_digits:
+                if d.known:
+                    yield d
 
 
 class Unknown(Digit):

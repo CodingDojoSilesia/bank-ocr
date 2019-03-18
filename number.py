@@ -59,24 +59,19 @@ class Number:
         return any([not d.known for d in self])
 
     def possible_numbers(self):
-        p = []
         for d in self:
             for f in d.flips():
                 c = self[:]
                 c[self.index(d)] = f
                 new = Number(c)
                 if new.checksum_valid():
-                    p.append(new)
-
-        return p
+                    yield new
 
     def fix(self):
-        p = []
         for d in self:
             for f in d.fixes():
                 c = self[:]
                 c[self.index(d)] = f
                 new = Number(c)
                 if new.checksum_valid():
-                    p.append(new)
-        return p
+                    yield new
