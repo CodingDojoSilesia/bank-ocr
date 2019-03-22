@@ -58,20 +58,17 @@ class Number:
     def incorrect_scan(self):
         return any([not d.known for d in self])
 
-    def possible_numbers(self):
+    def _pick_only(self, predicate):
         for d in self:
-            for f in d.flips():
+            for f in getattr(d, predicate)():
                 c = self[:]
                 c[self.index(d)] = f
                 new = Number(c)
                 if new.checksum_valid():
                     yield new
 
+    def possible_numbers(self):
+        return self._pick_only("flips")
+
     def fix(self):
-        for d in self:
-            for f in d.fixes():
-                c = self[:]
-                c[self.index(d)] = f
-                new = Number(c)
-                if new.checksum_valid():
-                    yield new
+        return self._pick_only("fixes")

@@ -1,35 +1,6 @@
 from itertools import chain
 
 
-class UnrecognisedDigit(Exception):
-    pass
-
-
-class DigitFactory:
-    def __new__(cls, text):
-        if text == (" _ ", "| |", "|_|") or text == "0":
-            return Zero(text)
-        if text == ("   ", "  |", "  |") or text == "1":
-            return One(text)
-        if text == (" _ ", " _|", "|_ ") or text == "2":
-            return Two(text)
-        if text == (" _ ", " _|", " _|") or text == "3":
-            return Three(text)
-        if text == ("   ", "|_|", "  |") or text == "4":
-            return Four(text)
-        if text == (" _ ", "|_ ", " _|") or text == "5":
-            return Five(text)
-        if text == (" _ ", "|_ ", "|_|") or text == "6":
-            return Six(text)
-        if text == (" _ ", "  |", "  |") or text == "7":
-            return Seven(text)
-        if text == (" _ ", "|_|", "|_|") or text == "8":
-            return Eight(text)
-        if text == (" _ ", "|_|", " _|") or text == "9":
-            return Nine(text)
-        return Unknown(text)
-
-
 class Digit:
     def __init__(self, text):
         self._text = text
@@ -55,7 +26,12 @@ class Digit:
             yield self  # no fixes for known digit
 
         # {number of "_" or "|" : list of combinations}
-        n = {0: ["   "], 1: [" _ ", "  |"], 2: ["| |", " _|", "|_ "], 3: ["|_|"]}
+        char_count = {
+            0: ["   "],
+            1: [" _ ", "  |"],
+            2: ["| |", " _|", "|_ "],
+            3: ["|_|"],
+        }
 
         for i, e in enumerate(self._text):
             pipes = e.count("_") + e.count("|")
@@ -63,7 +39,7 @@ class Digit:
                 pipe_range = range(0, 3)
             else:
                 pipe_range = range(0, pipes + 2)
-            replacements = chain.from_iterable([n[p] for p in pipe_range])
+            replacements = chain.from_iterable([char_count[p] for p in pipe_range])
 
             def new_digit(current_digit, element_index, replacement):
                 c = list(current_digit[:])
@@ -130,3 +106,28 @@ class Eight(Digit):
 class Nine(Digit):
     value = "9"
     _options = ["8", "3", "5"]
+
+
+class UnrecognisedDigit(Exception):
+    pass
+
+
+class DigitFactory:
+    def __new__(cls, text):
+        digits = {
+            ((" _ ", "| |", "|_|"), "0"): Zero,
+            (("   ", "  |", "  |"), "1"): One,
+            ((" _ ", " _|", "|_ "), "2"): Two,
+            ((" _ ", " _|", " _|"), "3"): Three,
+            (("   ", "|_|", "  |"), "4"): Four,
+            ((" _ ", "|_ ", " _|"), "5"): Five,
+            ((" _ ", "|_ ", "|_|"), "6"): Six,
+            ((" _ ", "  |", "  |"), "7"): Seven,
+            ((" _ ", "|_|", "|_|"), "8"): Eight,
+            ((" _ ", "|_|", " _|"), "9"): Nine,
+        }
+        for d, c in digits.items():
+            if text in d:
+                return c(text)
+        else:
+            return Unknown(text)
